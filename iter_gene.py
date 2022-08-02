@@ -1,7 +1,7 @@
-nested_list = [1, 2,
+nested_list = [
 	['a', 'b', 'c'],
 	['d', 'e', 'f', 'h', False],
-	[1, 2, None], 3
+	[1, 2, None],
 ]
 
 def flat_generator(lst):
@@ -14,30 +14,31 @@ def flat_generator(lst):
             yield lst[i]
         i += 1
 
+for i in flat_generator(nested_list):
+    print(i)
 
-# for i in flat_generator(nested_list):
-#     print(i)
+class FlatIterator:
+    def __init__(self, lst):
+        self.lst = lst
+        self.cursor = -1
+        self.next_cursor = 0
+        self.end = len(self.lst)
 
-def FlatIterator1(lst):
-    i = 0
-    it = iter(lst)
-    while i < len(lst):
-        i += 1
-        el = next(it)
-        if isinstance(el, list):
-            j = 0
-            it_el = iter(el)
-            while j < len(el):
-                j += 1
-                el_el = next(it_el)
-                # if isinstance(el_el, lst):
-                #     yield FlatIterator(el_el)
-                yield el_el
-            
-        else:
-            yield el
+    def __iter__(self):
+        self.next_cursor = 0
+        self.cursor += 1
+        return self
+
+    def __next__(self):
+        if self.next_cursor == len(self.lst[self.cursor]):
+            iter(self)
+        self.next_cursor += 1
+        if self.cursor == self.end:  # условие выход из цикла
+            raise StopIteration  # выход из цикла
+        return self.lst[self.cursor][self.next_cursor - 1]
+    
+for item in FlatIterator(nested_list):
+    print(item)
 
 
-
-for j in FlatIterator(nested_list):
-    print(j)
+    
